@@ -1,5 +1,5 @@
 import { createHash } from 'crypto';
-import PoWConsensus from './consensus/pow.js';
+import PoW from './pow.js';
 
 class Blockchain {
     constructor() {
@@ -52,7 +52,7 @@ class Blockchain {
 
     mine(nodeAddress) {
         // Find consensus
-        const consensus = new PoWConsensus().find();
+        const consensus = new PoW().find();
         // Add miner reward to the mining node
         this.newTransaction('0', nodeAddress, 5);
         // Add new block to the chain

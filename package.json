@@ -19,6 +19,7 @@
   "homepage": "https://github.com/imnetcat/blockchain2#readme",
   "type": "module",
   "dependencies": {
-    "express": "^4.17.2"
+    "express": "^4.17.2",
+    "request-promise": "^4.2.6"
   }
 }

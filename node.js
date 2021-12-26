@@ -2,19 +2,48 @@ import express from 'express';
 import Blockchain from "./blockchain.js";
 
 class Node {
-    constructor(nodeAddress) {
+    constructor(nodeAddress, port) {
         const blockchain = new Blockchain();
         this.app = express();
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
-        this.port = 5000
+        this.port = port;
+
+        this.app.post('/nodes/register', (req, res) => {
+            if(!req.body.nodes) {
+                res.send('Error: Please supply a valid list of nodes');
+                return;
+            }
+
+            for(const node of req.body.nodes) {
+                blockchain.addNode(node);
+            }
+
+            res.send({
+                message: 'New nodes have been added',
+                total_nodes: Array.from(blockchain.nodes)
+            });
+        });
+        this.app.post('/nodes/resolve', async (req, res) => {
+            const replaced = await blockchain.resolveConflicts();
+            if(replaced) {
+                res.send({
+                    message: 'Our chain was replaced',
+                    new_chain: blockchain.chain
+                });
+            } else {
+                res.send({
+                    message: 'Our chain is authoritative',
+                    chain: blockchain.chain
+                });
+            }
+        });
 
         this.app.post('/transactions/new', (req, res) => {
             const {
                 sender, recipient, amount
             } = req.body;
             if (!sender || !recipient || !amount) {
-                res.status(500);
                 res.end('Missing data!');
                 return;
             }

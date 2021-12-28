@@ -11,6 +11,7 @@ class Blockchain {
         this.nodes = new Set();
         this.chain = [];
         this.transactions = [];
+        this.address = {};
         // Generate genesis block - the first block of the chain
         this.newBlock('05102001', 'Guskov');
     }
@@ -40,6 +41,10 @@ class Blockchain {
         return true;
     }
 
+    checkAddressBalance(address) {
+        return this.address[address] || 0;
+    }
+    
     // Resolve consensus problem
     // Replaces chain with the longest node in the network
     async resolveConflicts() {
@@ -76,6 +81,19 @@ class Blockchain {
             proof,
             parentHash: parentHash || this.hash(parentBlock),
         };
+
+        // Process transactions
+        this.transactions.forEach(({ sender, recipient, amount }) => {
+            if(!this.address[sender]) {
+                this.address[sender] = 0
+            }
+            if(!this.address[recipient]) {
+                this.address[recipient] = 0
+            }
+            this.address[sender] -= amount;
+            this.address[recipient] += amount;
+        });
+
         // Add blcok to the chain
         this.chain.push(block);
         // clear transiction queue

@@ -24,6 +24,12 @@ class Node {
                 total_nodes: Array.from(blockchain.nodes)
             });
         });
+
+        this.app.post('/getBalance', (req, res) => {
+            const address = req.body.address;
+            res.send({ address, balance: blockchain.checkAddressBalance(address) });
+        });
+        
         this.app.post('/nodes/resolve', async (req, res) => {
             const replaced = await blockchain.resolveConflicts();
             if(replaced) {
